@@ -11,7 +11,7 @@ pipeline {
 
         stage('Run Python Script') {
             steps {
-                sh 'python3 python3.py'
+                sh 'python3 python.py'
             }
         }
 
@@ -33,7 +33,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                echo "SonarQube analysis completed successfully."
+                echo "SonarQube analysis completed."
             }
         }
     }
