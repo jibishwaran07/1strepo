@@ -23,11 +23,14 @@ pipeline {
                 sh '''
                 echo "========= STARTING SONARQUBE SCAN ========="
 
-                sonar-scanner \
-                  -Dsonar.projectKey=test \
-                  -Dsonar.sources=. \
-                  -Dsonar.host.url=http://localhost:9000 \
-                  -Dsonar.login=sqp_fe2535d44ac6990cff748ea021bf72aa2899e0d9
+                docker run --rm \
+                  --network host \
+                  -v "$(pwd):/usr/src" \
+                  sonarsource/sonar-scanner-cli:5 \
+                    -Dsonar.projectKey=test \
+                    -Dsonar.sources=/usr/src \
+                    -Dsonar.host.url=http://localhost:9000 \
+                    -Dsonar.login=sqp_fe2535d44ac6990cff748ea021bf72aa2899e0d9
                 '''
             }
         }
@@ -35,10 +38,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ SonarQube scan completed successfully'
+            echo "✅ SonarQube scan SUCCESS"
         }
         failure {
-            echo '❌ SonarQube scan failed'
+            echo "❌ SonarQube scan FAILED"
         }
     }
 }
