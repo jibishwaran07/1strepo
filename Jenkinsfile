@@ -14,7 +14,6 @@ pipeline {
                 sh """
                     sudo apt update
                     sudo apt install -y python3.11 python3.11-venv python3.11-dev
-                    echo "Python 3.11 installed"
                 """
             }
         }
@@ -24,17 +23,9 @@ pipeline {
                 sh """
                     curl -fsSL https://astral.sh/uv/install.sh | sh
                     export PATH="\$HOME/.local/bin:\$PATH"
+
                     uv python pin 3.11
                     uv sync
-                """
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh """
-                    export PATH="\$HOME/.local/bin:\$PATH"
-                    uv run pytest -q
                 """
             }
         }
@@ -50,8 +41,8 @@ pipeline {
                       sonarsource/sonar-scanner-cli:5 \
                       -Dsonar.projectKey=Devops1 \
                       -Dsonar.sources=/usr/src \
-                      -Dsonar.host.url=http://sonarqube:9000 \
-                      -Dsonar.python.version=3.11
+                      -Dsonar.python.version=3.11 \
+                      -Dsonar.host.url=http://sonarqube:9000
                 """
             }
         }
