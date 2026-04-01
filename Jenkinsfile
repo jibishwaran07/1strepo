@@ -9,9 +9,26 @@ pipeline {
             }
         }
 
-        stage('Run Python Script') {
+        stage('Install Dependencies') {
             steps {
-                sh 'python3 python.py'
+                sh """
+                    # Install uv if not present
+                    if ! command -v uv &> /dev/null; then
+                        curl -fsSL https://astral.sh/uv/install.sh | sh
+                        export PATH="\$HOME/.local/bin:\$PATH"
+                    fi
+
+                    # Sync environment according to pyproject.toml + uv.lock
+                    uv sync
+                """
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh """
+                    uv run pytest -q
+                """
             }
         }
 
@@ -26,6 +43,7 @@ pipeline {
                       sonarsource/sonar-scanner-cli:5 \
                       -Dsonar.projectKey=Devops1 \
                       -Dsonar.sources=/usr/src \
+                      -Dsonar.python.version=3 \
                       -Dsonar.host.url=http://sonarqube:9000
                 """
             }
@@ -33,7 +51,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                echo "SonarQube analysis completed."
+                echo "SonarQube analysis successfully completed."
             }
         }
     }
