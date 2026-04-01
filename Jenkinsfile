@@ -49,7 +49,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                echo "✅ SonarQube analysis completed successfully."
+                echo "✅ Sonar scan completed successfully!"
             }
         }
     }
