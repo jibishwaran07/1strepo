@@ -9,15 +9,9 @@ pipeline {
             }
         }
 
-        stage('Run Shell Script') {
-            steps {
-                sh './shellfile.sh'
-            }
-        }
-
         stage('Run Python Script') {
             steps {
-                sh 'python3 python4.py'
+                sh 'python3 python3.py'
             }
         }
 
@@ -39,7 +33,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                echo "SonarQube analysis completed. Check dashboard."
+                echo "SonarQube analysis completed successfully."
             }
         }
     }
