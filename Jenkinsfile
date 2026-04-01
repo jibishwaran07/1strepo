@@ -9,16 +9,22 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Python 3.11') {
             steps {
                 sh """
-                    # Install uv if not present
-                    if ! command -v uv &> /dev/null; then
-                        curl -fsSL https://astral.sh/uv/install.sh | sh
-                        export PATH="\$HOME/.local/bin:\$PATH"
-                    fi
+                    sudo apt update
+                    sudo apt install -y python3.11 python3.11-venv python3.11-dev
+                    echo "Python 3.11 installed"
+                """
+            }
+        }
 
-                    # Sync environment according to pyproject.toml + uv.lock
+        stage('Install uv with Python 3.11') {
+            steps {
+                sh """
+                    curl -fsSL https://astral.sh/uv/install.sh | sh
+                    export PATH="\$HOME/.local/bin:\$PATH"
+                    uv python pin 3.11
                     uv sync
                 """
             }
@@ -27,6 +33,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh """
+                    export PATH="\$HOME/.local/bin:\$PATH"
                     uv run pytest -q
                 """
             }
@@ -43,15 +50,15 @@ pipeline {
                       sonarsource/sonar-scanner-cli:5 \
                       -Dsonar.projectKey=Devops1 \
                       -Dsonar.sources=/usr/src \
-                      -Dsonar.python.version=3 \
-                      -Dsonar.host.url=http://sonarqube:9000
+                      -Dsonar.host.url=http://sonarqube:9000 \
+                      -Dsonar.python.version=3.11
                 """
             }
         }
 
         stage('Quality Gate') {
             steps {
-                echo "SonarQube analysis successfully completed."
+                echo "✅ SonarQube analysis completed successfully."
             }
         }
     }
