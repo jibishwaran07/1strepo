@@ -12,7 +12,7 @@ pipeline {
         stage('Show Workspace Files') {
             steps {
                 sh '''
-                echo "===== WORKSPACE FILES ====="
+                echo "========= WORKSPACE CONTENTS ========="
                 ls -l
                 '''
             }
@@ -21,19 +21,13 @@ pipeline {
         stage('SonarQube Scan') {
             steps {
                 sh '''
-                echo "===== STARTING SONAR SCAN ====="
+                echo "========= STARTING SONARQUBE SCAN ========="
 
-                docker run --rm \
-                  --network host \
-                  -e SONAR_HOST_URL="http://localhost:9000" \
-                  -e SONAR_LOGIN="sqp_464e44936e377a2a1d6e2f18d94498cd2eb1cb7d" \
-                  -v "$(pwd):/usr/src" \
-                  sonarsource/sonar-scanner-cli:5 \
-                    -Dsonar.projectKey=1strepo \
-                    -Dsonar.projectName=1strepo \
-                    -Dsonar.sources=/usr/src \
-                    -Dsonar.python.version=3.11 \
-                    -Dsonar.host.url=http://localhost:9000
+                sonar-scanner \
+                  -Dsonar.projectKey=test \
+                  -Dsonar.sources=. \
+                  -Dsonar.host.url=http://localhost:9000 \
+                  -Dsonar.login=sqp_fe2535d44ac6990cff748ea021bf72aa2899e0d9
                 '''
             }
         }
@@ -41,10 +35,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ SonarQube Analysis Completed Successfully"
+            echo '✅ SonarQube scan completed successfully'
         }
         failure {
-            echo "❌ SonarQube Analysis Failed"
+            echo '❌ SonarQube scan failed'
         }
     }
 }
